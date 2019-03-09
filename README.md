@@ -202,5 +202,3 @@ Class | Method | HTTP request | Description
 ## Author
 
 hello@heroiclabs.com
-
-# godot-nakama
