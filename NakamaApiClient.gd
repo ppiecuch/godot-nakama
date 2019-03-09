@@ -25,7 +25,55 @@ var request_type
 
 var busy = false
 
-@include "model/model_api.gd.inc"
+
+const ApiAccount = ['user', 'wallet', 'email', 'devices', 'custom_id', 'verify_time']
+const ApiAccountCustom = ['id']
+const ApiAccountDevice = ['id']
+const ApiAccountEmail = ['email', 'password']
+const ApiAccountFacebook = ['token']
+const ApiAccountGameCenter = ['player_id', 'bundle_id', 'timestamp_seconds', 'salt', 'signature', 'public_key_url']
+const ApiAccountGoogle = ['token']
+const ApiAccountSteam = ['token']
+const ApiChannelMessage = ['channel_id', 'message_id', 'code', 'sender_id', 'username', 'content', 'create_time', 'update_time', 'persistent']
+const ApiChannelMessageList = ['messages', 'next_cursor', 'prev_cursor']
+const ApiCreateGroupRequest = ['name', 'description', 'lang_tag', 'avatar_url', 'open']
+const ApiDeleteStorageObjectId = ['collection', 'key', 'version']
+const ApiDeleteStorageObjectsRequest = ['object_ids']
+const ApiFriend = ['user', 'state']
+const ApiFriends = ['friends']
+const ApiGroup = ['id', 'creator_id', 'name', 'description', 'lang_tag', 'metadata', 'avatar_url', 'open', 'edge_count', 'max_count', 'create_time', 'update_time']
+const ApiGroupList = ['groups', '_cursor']
+const ApiGroupUserList = ['group_users']
+const ApiLeaderboardRecord = ['leaderboard_id', 'owner_id', 'username', 'score', 'subscore', 'num_score', 'metadata', 'create_time', 'update_time', 'expiry_time', 'rank', 'max_num_score']
+const ApiLeaderboardRecordList = ['records', 'owner_records', 'next_cursor', 'prev_cursor']
+const ApiMatch = ['match_id', 'authoritative', 'label', 'size']
+const ApiMatchList = ['matches']
+const ApiNotification = ['id', 'subject', 'content', 'code', 'sender_id', 'create_time', 'persistent']
+const ApiNotificationList = ['notifications', 'cacheable_cursor']
+const ApiReadStorageObjectId = ['collection', 'key', 'user_id']
+const ApiReadStorageObjectsRequest = ['object_ids']
+const ApiRpc = ['id', 'payload', 'http_key']
+const ApiSession = ['created', 'token', 'udp_token']
+const ApiStorageObject = ['collection', 'key', 'user_id', 'value', 'version', 'permission_read', 'permission_write', 'create_time', 'update_time']
+const ApiStorageObjectAck = ['collection', 'key', 'version', 'user_id']
+const ApiStorageObjectAcks = ['acks']
+const ApiStorageObjectList = ['objects', '_cursor']
+const ApiStorageObjects = ['objects']
+const ApiTournament = ['id', 'title', 'description', 'category', 'sort_order', 'size', 'max_size', 'max_num_score', 'can_enter', 'end_active', 'next_reset', 'metadata', 'create_time', 'start_time', 'end_time', 'duration']
+const ApiTournamentList = ['tournaments', '_cursor']
+const ApiTournamentRecordList = ['records', 'owner_records', 'next_cursor', 'prev_cursor']
+const ApiUpdateAccountRequest = ['username', 'display_name', 'avatar_url', 'lang_tag', 'location', 'timezone']
+const ApiUpdateGroupRequest = ['group_id', 'name', 'description', 'lang_tag', 'avatar_url', 'open']
+const ApiUser = ['id', 'username', 'display_name', 'avatar_url', 'lang_tag', 'location', 'timezone', 'metadata', 'facebook_id', 'google_id', 'gamecenter_id', 'steam_id', 'online', 'edge_count', 'create_time', 'update_time']
+const ApiUserGroupList = ['user_groups']
+const ApiUsers = ['users']
+const ApiWriteStorageObject = ['collection', 'key', 'value', 'version', 'permission_read', 'permission_write']
+const ApiWriteStorageObjectsRequest = ['objects']
+const GroupUserListGroupUser = ['user', 'state']
+const ProtobufEmpty = []
+const UserGroupListUserGroup = ['group', 'state']
+const WriteLeaderboardRecordRequestLeaderboardRecordWrite = ['score', 'subscore', 'metadata']
+const WriteTournamentRecordRequestTournamentRecordWrite = ['score', 'subscore', 'metadata']
 
 
 """Add friends by ID or username to a user's account.
@@ -49,7 +97,7 @@ func add_friends(kwargs={}):
 
 signal api_add_group_users(success)
 
-func add_group_users(__String__group_id, kwargs={}):
+func add_group_users(group_id, kwargs={}):
     if busy: return
     busy = true
     var req = compose_req('POST', '/v2/group/{group_id}/add', {  }, { group_id=group_id }, {  }, {  }, {  })
@@ -66,12 +114,12 @@ func add_group_users(__String__group_id, kwargs={}):
 
 signal api_authenticate_custom(success)
 
-func authenticate_custom(__ApiAccountCustom__body, kwargs={}):
+func authenticate_custom(id, kwargs={}):
     if busy: return
     busy = true
     var create = kwargs['create']
     var username = kwargs['username']
-    var req = compose_req('POST', '/v2/account/authenticate/custom', { create=create, username=username }, {  }, {  }, {  }, { __ApiAccountCustom__dict })
+    var req = compose_req('POST', '/v2/account/authenticate/custom', { create=create, username=username }, {  }, {  }, {  }, { id=id })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -85,12 +133,12 @@ func authenticate_custom(__ApiAccountCustom__body, kwargs={}):
 
 signal api_authenticate_device(success)
 
-func authenticate_device(__ApiAccountDevice__body, kwargs={}):
+func authenticate_device(id, kwargs={}):
     if busy: return
     busy = true
     var create = kwargs['create']
     var username = kwargs['username']
-    var req = compose_req('POST', '/v2/account/authenticate/device', { create=create, username=username }, {  }, {  }, {  }, { __ApiAccountDevice__dict })
+    var req = compose_req('POST', '/v2/account/authenticate/device', { create=create, username=username }, {  }, {  }, {  }, { id=id })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -104,12 +152,12 @@ func authenticate_device(__ApiAccountDevice__body, kwargs={}):
 
 signal api_authenticate_email(success)
 
-func authenticate_email(__ApiAccountEmail__body, kwargs={}):
+func authenticate_email(email, password, kwargs={}):
     if busy: return
     busy = true
     var create = kwargs['create']
     var username = kwargs['username']
-    var req = compose_req('POST', '/v2/account/authenticate/email', { create=create, username=username }, {  }, {  }, {  }, { __ApiAccountEmail__dict })
+    var req = compose_req('POST', '/v2/account/authenticate/email', { create=create, username=username }, {  }, {  }, {  }, { email=email, password=password })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -124,13 +172,13 @@ func authenticate_email(__ApiAccountEmail__body, kwargs={}):
 
 signal api_authenticate_facebook(success)
 
-func authenticate_facebook(__ApiAccountFacebook__body, kwargs={}):
+func authenticate_facebook(token, kwargs={}):
     if busy: return
     busy = true
     var create = kwargs['create']
     var username = kwargs['username']
     var _sync = kwargs['_sync']
-    var req = compose_req('POST', '/v2/account/authenticate/facebook', { create=create, username=username, _sync=_sync }, {  }, {  }, {  }, { __ApiAccountFacebook__dict })
+    var req = compose_req('POST', '/v2/account/authenticate/facebook', { create=create, username=username, _sync=_sync }, {  }, {  }, {  }, { token=token })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -144,12 +192,12 @@ func authenticate_facebook(__ApiAccountFacebook__body, kwargs={}):
 
 signal api_authenticate_game_center(success)
 
-func authenticate_game_center(__ApiAccountGameCenter__body, kwargs={}):
+func authenticate_game_center(player_id, bundle_id, timestamp_seconds, salt, signature, public_key_url, kwargs={}):
     if busy: return
     busy = true
     var create = kwargs['create']
     var username = kwargs['username']
-    var req = compose_req('POST', '/v2/account/authenticate/gamecenter', { create=create, username=username }, {  }, {  }, {  }, { __ApiAccountGameCenter__dict })
+    var req = compose_req('POST', '/v2/account/authenticate/gamecenter', { create=create, username=username }, {  }, {  }, {  }, { player_id=player_id, bundle_id=bundle_id, timestamp_seconds=timestamp_seconds, salt=salt, signature=signature, public_key_url=public_key_url })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -163,12 +211,12 @@ func authenticate_game_center(__ApiAccountGameCenter__body, kwargs={}):
 
 signal api_authenticate_google(success)
 
-func authenticate_google(__ApiAccountGoogle__body, kwargs={}):
+func authenticate_google(token, kwargs={}):
     if busy: return
     busy = true
     var create = kwargs['create']
     var username = kwargs['username']
-    var req = compose_req('POST', '/v2/account/authenticate/google', { create=create, username=username }, {  }, {  }, {  }, { __ApiAccountGoogle__dict })
+    var req = compose_req('POST', '/v2/account/authenticate/google', { create=create, username=username }, {  }, {  }, {  }, { token=token })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -182,12 +230,12 @@ func authenticate_google(__ApiAccountGoogle__body, kwargs={}):
 
 signal api_authenticate_steam(success)
 
-func authenticate_steam(__ApiAccountSteam__body, kwargs={}):
+func authenticate_steam(token, kwargs={}):
     if busy: return
     busy = true
     var create = kwargs['create']
     var username = kwargs['username']
-    var req = compose_req('POST', '/v2/account/authenticate/steam', { create=create, username=username }, {  }, {  }, {  }, { __ApiAccountSteam__dict })
+    var req = compose_req('POST', '/v2/account/authenticate/steam', { create=create, username=username }, {  }, {  }, {  }, { token=token })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -213,10 +261,10 @@ func block_friends(kwargs={}):
 
 signal api_create_group(success)
 
-func create_group(__ApiCreateGroupRequest__body, kwargs={}):
+func create_group(name, description, lang_tag, avatar_url, open, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/group', {  }, {  }, {  }, {  }, { __ApiCreateGroupRequest__dict })
+    var req = compose_req('POST', '/v2/group', {  }, {  }, {  }, {  }, { name=name, description=description, lang_tag=lang_tag, avatar_url=avatar_url, open=open })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -246,7 +294,7 @@ func delete_friends(kwargs={}):
 
 signal api_delete_group(success)
 
-func delete_group(__String__group_id, kwargs={}):
+func delete_group(group_id, kwargs={}):
     if busy: return
     busy = true
     var req = compose_req('DELETE', '/v2/group/{group_id}', {  }, { group_id=group_id }, {  }, {  }, {  })
@@ -261,7 +309,7 @@ func delete_group(__String__group_id, kwargs={}):
 
 signal api_delete_leaderboard_record(success)
 
-func delete_leaderboard_record(__String__leaderboard_id, kwargs={}):
+func delete_leaderboard_record(leaderboard_id, kwargs={}):
     if busy: return
     busy = true
     var req = compose_req('DELETE', '/v2/leaderboard/{leaderboard_id}', {  }, { leaderboard_id=leaderboard_id }, {  }, {  }, {  })
@@ -292,10 +340,10 @@ func delete_notifications(kwargs={}):
 
 signal api_delete_storage_objects(success)
 
-func delete_storage_objects(__ApiDeleteStorageObjectsRequest__body, kwargs={}):
+func delete_storage_objects(object_ids, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('PUT', '/v2/storage/delete', {  }, {  }, {  }, {  }, { __ApiDeleteStorageObjectsRequest__dict })
+    var req = compose_req('PUT', '/v2/storage/delete', {  }, {  }, {  }, {  }, { object_ids=object_ids })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -356,11 +404,11 @@ func healthcheck(kwargs={}):
 
 signal api_import_facebook_friends(success)
 
-func import_facebook_friends(__ApiAccountFacebook__body, kwargs={}):
+func import_facebook_friends(token, kwargs={}):
     if busy: return
     busy = true
     var reset = kwargs['reset']
-    var req = compose_req('POST', '/v2/friend/facebook', { reset=reset }, {  }, {  }, {  }, { __ApiAccountFacebook__dict })
+    var req = compose_req('POST', '/v2/friend/facebook', { reset=reset }, {  }, {  }, {  }, { token=token })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -372,7 +420,7 @@ func import_facebook_friends(__ApiAccountFacebook__body, kwargs={}):
 
 signal api_join_group(success)
 
-func join_group(__String__group_id, kwargs={}):
+func join_group(group_id, kwargs={}):
     if busy: return
     busy = true
     var req = compose_req('POST', '/v2/group/{group_id}/join', {  }, { group_id=group_id }, {  }, {  }, {  })
@@ -387,7 +435,7 @@ func join_group(__String__group_id, kwargs={}):
 
 signal api_join_tournament(success)
 
-func join_tournament(__String__tournament_id, kwargs={}):
+func join_tournament(tournament_id, kwargs={}):
     if busy: return
     busy = true
     var req = compose_req('POST', '/v2/tournament/{tournament_id}/join', {  }, { tournament_id=tournament_id }, {  }, {  }, {  })
@@ -402,7 +450,7 @@ func join_tournament(__String__tournament_id, kwargs={}):
 
 signal api_kick_group_users(success)
 
-func kick_group_users(__String__group_id, kwargs={}):
+func kick_group_users(group_id, kwargs={}):
     if busy: return
     busy = true
     var req = compose_req('POST', '/v2/group/{group_id}/kick', {  }, { group_id=group_id }, {  }, {  }, {  })
@@ -417,7 +465,7 @@ func kick_group_users(__String__group_id, kwargs={}):
 
 signal api_leave_group(success)
 
-func leave_group(__String__group_id, kwargs={}):
+func leave_group(group_id, kwargs={}):
     if busy: return
     busy = true
     var req = compose_req('POST', '/v2/group/{group_id}/leave', {  }, { group_id=group_id }, {  }, {  }, {  })
@@ -432,10 +480,10 @@ func leave_group(__String__group_id, kwargs={}):
 
 signal api_link_custom(success)
 
-func link_custom(__ApiAccountCustom__body, kwargs={}):
+func link_custom(id, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/link/custom', {  }, {  }, {  }, {  }, { __ApiAccountCustom__dict })
+    var req = compose_req('POST', '/v2/account/link/custom', {  }, {  }, {  }, {  }, { id=id })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -447,10 +495,10 @@ func link_custom(__ApiAccountCustom__body, kwargs={}):
 
 signal api_link_device(success)
 
-func link_device(__ApiAccountDevice__body, kwargs={}):
+func link_device(id, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/link/device', {  }, {  }, {  }, {  }, { __ApiAccountDevice__dict })
+    var req = compose_req('POST', '/v2/account/link/device', {  }, {  }, {  }, {  }, { id=id })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -462,10 +510,10 @@ func link_device(__ApiAccountDevice__body, kwargs={}):
 
 signal api_link_email(success)
 
-func link_email(__ApiAccountEmail__body, kwargs={}):
+func link_email(email, password, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/link/email', {  }, {  }, {  }, {  }, { __ApiAccountEmail__dict })
+    var req = compose_req('POST', '/v2/account/link/email', {  }, {  }, {  }, {  }, { email=email, password=password })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -478,11 +526,11 @@ func link_email(__ApiAccountEmail__body, kwargs={}):
 
 signal api_link_facebook(success)
 
-func link_facebook(__ApiAccountFacebook__body, kwargs={}):
+func link_facebook(token, kwargs={}):
     if busy: return
     busy = true
     var _sync = kwargs['_sync']
-    var req = compose_req('POST', '/v2/account/link/facebook', { _sync=_sync }, {  }, {  }, {  }, { __ApiAccountFacebook__dict })
+    var req = compose_req('POST', '/v2/account/link/facebook', { _sync=_sync }, {  }, {  }, {  }, { token=token })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -494,10 +542,10 @@ func link_facebook(__ApiAccountFacebook__body, kwargs={}):
 
 signal api_link_game_center(success)
 
-func link_game_center(__ApiAccountGameCenter__body, kwargs={}):
+func link_game_center(player_id, bundle_id, timestamp_seconds, salt, signature, public_key_url, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/link/gamecenter', {  }, {  }, {  }, {  }, { __ApiAccountGameCenter__dict })
+    var req = compose_req('POST', '/v2/account/link/gamecenter', {  }, {  }, {  }, {  }, { player_id=player_id, bundle_id=bundle_id, timestamp_seconds=timestamp_seconds, salt=salt, signature=signature, public_key_url=public_key_url })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -509,10 +557,10 @@ func link_game_center(__ApiAccountGameCenter__body, kwargs={}):
 
 signal api_link_google(success)
 
-func link_google(__ApiAccountGoogle__body, kwargs={}):
+func link_google(token, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/link/google', {  }, {  }, {  }, {  }, { __ApiAccountGoogle__dict })
+    var req = compose_req('POST', '/v2/account/link/google', {  }, {  }, {  }, {  }, { token=token })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -524,10 +572,10 @@ func link_google(__ApiAccountGoogle__body, kwargs={}):
 
 signal api_link_steam(success)
 
-func link_steam(__ApiAccountSteam__body, kwargs={}):
+func link_steam(token, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/link/steam', {  }, {  }, {  }, {  }, { __ApiAccountSteam__dict })
+    var req = compose_req('POST', '/v2/account/link/steam', {  }, {  }, {  }, {  }, { token=token })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -542,7 +590,7 @@ func link_steam(__ApiAccountSteam__body, kwargs={}):
 
 signal api_list_channel_messages(success)
 
-func list_channel_messages(__String__channel_id, kwargs={}):
+func list_channel_messages(channel_id, kwargs={}):
     if busy: return
     busy = true
     var limit = kwargs['limit']
@@ -574,7 +622,7 @@ func list_friends(kwargs={}):
 
 signal api_list_group_users(success)
 
-func list_group_users(__String__group_id, kwargs={}):
+func list_group_users(group_id, kwargs={}):
     if busy: return
     busy = true
     var req = compose_req('GET', '/v2/group/{group_id}/user', {  }, { group_id=group_id }, {  }, {  }, {  })
@@ -612,7 +660,7 @@ func list_groups(kwargs={}):
 
 signal api_list_leaderboard_records(success)
 
-func list_leaderboard_records(__String__leaderboard_id, kwargs={}):
+func list_leaderboard_records(leaderboard_id, kwargs={}):
     if busy: return
     busy = true
     var owner_ids = kwargs['owner_ids']
@@ -632,7 +680,7 @@ func list_leaderboard_records(__String__leaderboard_id, kwargs={}):
 
 signal api_list_leaderboard_records_around_owner(success)
 
-func list_leaderboard_records_around_owner(__String__leaderboard_id, __String__owner_id, kwargs={}):
+func list_leaderboard_records_around_owner(leaderboard_id, owner_id, kwargs={}):
     if busy: return
     busy = true
     var limit = kwargs['limit']
@@ -695,7 +743,7 @@ func list_notifications(kwargs={}):
 
 signal api_list_storage_objects(success)
 
-func list_storage_objects(__String__collection, kwargs={}):
+func list_storage_objects(collection, kwargs={}):
     if busy: return
     busy = true
     var user_id = kwargs['user_id']
@@ -716,7 +764,7 @@ func list_storage_objects(__String__collection, kwargs={}):
 
 signal api_list_storage_objects2(success)
 
-func list_storage_objects2(__String__collection, __String__user_id, kwargs={}):
+func list_storage_objects2(collection, user_id, kwargs={}):
     if busy: return
     busy = true
     var limit = kwargs['limit']
@@ -736,7 +784,7 @@ func list_storage_objects2(__String__collection, __String__user_id, kwargs={}):
 
 signal api_list_tournament_records(success)
 
-func list_tournament_records(__String__tournament_id, kwargs={}):
+func list_tournament_records(tournament_id, kwargs={}):
     if busy: return
     busy = true
     var owner_ids = kwargs['owner_ids']
@@ -756,7 +804,7 @@ func list_tournament_records(__String__tournament_id, kwargs={}):
 
 signal api_list_tournament_records_around_owner(success)
 
-func list_tournament_records_around_owner(__String__tournament_id, __String__owner_id, kwargs={}):
+func list_tournament_records_around_owner(tournament_id, owner_id, kwargs={}):
     if busy: return
     busy = true
     var limit = kwargs['limit']
@@ -798,7 +846,7 @@ func list_tournaments(kwargs={}):
 
 signal api_list_user_groups(success)
 
-func list_user_groups(__String__user_id, kwargs={}):
+func list_user_groups(user_id, kwargs={}):
     if busy: return
     busy = true
     var req = compose_req('GET', '/v2/user/{user_id}/group', {  }, { user_id=user_id }, {  }, {  }, {  })
@@ -813,7 +861,7 @@ func list_user_groups(__String__user_id, kwargs={}):
 
 signal api_promote_group_users(success)
 
-func promote_group_users(__String__group_id, kwargs={}):
+func promote_group_users(group_id, kwargs={}):
     if busy: return
     busy = true
     var req = compose_req('POST', '/v2/group/{group_id}/promote', {  }, { group_id=group_id }, {  }, {  }, {  })
@@ -828,10 +876,10 @@ func promote_group_users(__String__group_id, kwargs={}):
 
 signal api_read_storage_objects(success)
 
-func read_storage_objects(__ApiReadStorageObjectsRequest__body, kwargs={}):
+func read_storage_objects(object_ids, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/storage', {  }, {  }, {  }, {  }, { __ApiReadStorageObjectsRequest__dict })
+    var req = compose_req('POST', '/v2/storage', {  }, {  }, {  }, {  }, { object_ids=object_ids })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -844,10 +892,10 @@ func read_storage_objects(__ApiReadStorageObjectsRequest__body, kwargs={}):
 
 signal api_rpc_func(success)
 
-func rpc_func(__String__id, __String__body, kwargs={}):
+func rpc_func(id, body, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/rpc/{id}', {  }, { id=id }, {  }, {  }, { __String__dict })
+    var req = compose_req('POST', '/v2/rpc/{id}', {  }, { id=id }, {  }, {  }, { }, body)
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -861,7 +909,7 @@ func rpc_func(__String__id, __String__body, kwargs={}):
 
 signal api_rpc_func2(success)
 
-func rpc_func2(__String__id, kwargs={}):
+func rpc_func2(id, kwargs={}):
     if busy: return
     busy = true
     var payload = kwargs['payload']
@@ -878,10 +926,10 @@ func rpc_func2(__String__id, kwargs={}):
 
 signal api_unlink_custom(success)
 
-func unlink_custom(__ApiAccountCustom__body, kwargs={}):
+func unlink_custom(id, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/unlink/custom', {  }, {  }, {  }, {  }, { __ApiAccountCustom__dict })
+    var req = compose_req('POST', '/v2/account/unlink/custom', {  }, {  }, {  }, {  }, { id=id })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -893,10 +941,10 @@ func unlink_custom(__ApiAccountCustom__body, kwargs={}):
 
 signal api_unlink_device(success)
 
-func unlink_device(__ApiAccountDevice__body, kwargs={}):
+func unlink_device(id, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/unlink/device', {  }, {  }, {  }, {  }, { __ApiAccountDevice__dict })
+    var req = compose_req('POST', '/v2/account/unlink/device', {  }, {  }, {  }, {  }, { id=id })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -908,10 +956,10 @@ func unlink_device(__ApiAccountDevice__body, kwargs={}):
 
 signal api_unlink_email(success)
 
-func unlink_email(__ApiAccountEmail__body, kwargs={}):
+func unlink_email(email, password, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/unlink/email', {  }, {  }, {  }, {  }, { __ApiAccountEmail__dict })
+    var req = compose_req('POST', '/v2/account/unlink/email', {  }, {  }, {  }, {  }, { email=email, password=password })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -923,10 +971,10 @@ func unlink_email(__ApiAccountEmail__body, kwargs={}):
 
 signal api_unlink_facebook(success)
 
-func unlink_facebook(__ApiAccountFacebook__body, kwargs={}):
+func unlink_facebook(token, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/unlink/facebook', {  }, {  }, {  }, {  }, { __ApiAccountFacebook__dict })
+    var req = compose_req('POST', '/v2/account/unlink/facebook', {  }, {  }, {  }, {  }, { token=token })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -938,10 +986,10 @@ func unlink_facebook(__ApiAccountFacebook__body, kwargs={}):
 
 signal api_unlink_game_center(success)
 
-func unlink_game_center(__ApiAccountGameCenter__body, kwargs={}):
+func unlink_game_center(player_id, bundle_id, timestamp_seconds, salt, signature, public_key_url, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/unlink/gamecenter', {  }, {  }, {  }, {  }, { __ApiAccountGameCenter__dict })
+    var req = compose_req('POST', '/v2/account/unlink/gamecenter', {  }, {  }, {  }, {  }, { player_id=player_id, bundle_id=bundle_id, timestamp_seconds=timestamp_seconds, salt=salt, signature=signature, public_key_url=public_key_url })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -953,10 +1001,10 @@ func unlink_game_center(__ApiAccountGameCenter__body, kwargs={}):
 
 signal api_unlink_google(success)
 
-func unlink_google(__ApiAccountGoogle__body, kwargs={}):
+func unlink_google(token, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/unlink/google', {  }, {  }, {  }, {  }, { __ApiAccountGoogle__dict })
+    var req = compose_req('POST', '/v2/account/unlink/google', {  }, {  }, {  }, {  }, { token=token })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -968,10 +1016,10 @@ func unlink_google(__ApiAccountGoogle__body, kwargs={}):
 
 signal api_unlink_steam(success)
 
-func unlink_steam(__ApiAccountSteam__body, kwargs={}):
+func unlink_steam(token, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/account/unlink/steam', {  }, {  }, {  }, {  }, { __ApiAccountSteam__dict })
+    var req = compose_req('POST', '/v2/account/unlink/steam', {  }, {  }, {  }, {  }, { token=token })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -983,10 +1031,10 @@ func unlink_steam(__ApiAccountSteam__body, kwargs={}):
 
 signal api_update_account(success)
 
-func update_account(__ApiUpdateAccountRequest__body, kwargs={}):
+func update_account(username, display_name, avatar_url, lang_tag, location, timezone, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('PUT', '/v2/account', {  }, {  }, {  }, {  }, { __ApiUpdateAccountRequest__dict })
+    var req = compose_req('PUT', '/v2/account', {  }, {  }, {  }, {  }, { username=username, display_name=display_name, avatar_url=avatar_url, lang_tag=lang_tag, location=location, timezone=timezone })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -999,10 +1047,10 @@ func update_account(__ApiUpdateAccountRequest__body, kwargs={}):
 
 signal api_update_group(success)
 
-func update_group(__String__group_id, __ApiUpdateGroupRequest__body, kwargs={}):
+func update_group(group_id, group_id, name, description, lang_tag, avatar_url, open, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('PUT', '/v2/group/{group_id}', {  }, { group_id=group_id }, {  }, {  }, { __ApiUpdateGroupRequest__dict })
+    var req = compose_req('PUT', '/v2/group/{group_id}', {  }, { group_id=group_id }, {  }, {  }, { group_id=group_id, name=name, description=description, lang_tag=lang_tag, avatar_url=avatar_url, open=open })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -1015,10 +1063,10 @@ func update_group(__String__group_id, __ApiUpdateGroupRequest__body, kwargs={}):
 
 signal api_write_leaderboard_record(success)
 
-func write_leaderboard_record(__String__leaderboard_id, __WriteLeaderboardRecordRequestLeaderboardRecordWrite__body, kwargs={}):
+func write_leaderboard_record(leaderboard_id, score, subscore, metadata, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('POST', '/v2/leaderboard/{leaderboard_id}', {  }, { leaderboard_id=leaderboard_id }, {  }, {  }, { __WriteLeaderboardRecordRequestLeaderboardRecordWrite__dict })
+    var req = compose_req('POST', '/v2/leaderboard/{leaderboard_id}', {  }, { leaderboard_id=leaderboard_id }, {  }, {  }, { score=score, subscore=subscore, metadata=metadata })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -1030,10 +1078,10 @@ func write_leaderboard_record(__String__leaderboard_id, __WriteLeaderboardRecord
 
 signal api_write_storage_objects(success)
 
-func write_storage_objects(__ApiWriteStorageObjectsRequest__body, kwargs={}):
+func write_storage_objects(objects, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('PUT', '/v2/storage', {  }, {  }, {  }, {  }, { __ApiWriteStorageObjectsRequest__dict })
+    var req = compose_req('PUT', '/v2/storage', {  }, {  }, {  }, {  }, { objects=objects })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
@@ -1046,10 +1094,10 @@ func write_storage_objects(__ApiWriteStorageObjectsRequest__body, kwargs={}):
 
 signal api_write_tournament_record(success)
 
-func write_tournament_record(__String__tournament_id, __WriteTournamentRecordRequestTournamentRecordWrite__body, kwargs={}):
+func write_tournament_record(tournament_id, score, subscore, metadata, kwargs={}):
     if busy: return
     busy = true
-    var req = compose_req('PUT', '/v2/tournament/{tournament_id}', {  }, { tournament_id=tournament_id }, {  }, {  }, { __WriteTournamentRecordRequestTournamentRecordWrite__dict })
+    var req = compose_req('PUT', '/v2/tournament/{tournament_id}', {  }, { tournament_id=tournament_id }, {  }, {  }, { score=score, subscore=subscore, metadata=metadata })
     request(req.url, req.headers, ssl_validate_domain, req.method, req.data)
     pass
 
