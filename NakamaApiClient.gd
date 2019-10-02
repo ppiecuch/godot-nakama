@@ -1127,12 +1127,12 @@ func compose_req(method, url, query_args, path_args, form_args, header_args, bod
         req.data = var2str(body_args)
     req.headers = [
         # HTTP header `Accept`
-        'Accept: application/json
+        'Accept: application/json',
         # HTTP header `Content-Type`
-        'Content-Type: application/json
+        'Content-Type: application/json'
     ].append(header_args)
     # Authentication setting
-    reg.auth_settings = []
+    req.auth_settings = []
     return req
     pass
 
